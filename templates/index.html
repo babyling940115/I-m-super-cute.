@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高雄港 AIS 模擬系統</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: monospace; }
+        #map { height: 100vh; width: 100vw; background: #0b132b; }
+        
+        .info-panel {
+            position: absolute; top: 15px; left: 15px; z-index: 1000;
+            background: rgba(15, 23, 42, 0.9); color: #38bdf8;
+            padding: 12px 18px; border-radius: 6px; border: 1px solid #0284c7;
+            font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        /* 關閉過渡動畫，實現 3 秒到時立即瞬移刷新 */
+        .leaflet-marker-icon {
+            transition: none !important;
+        }
+
+        .ship-marker {
+            width: 0; height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 22px solid #38bdf8;
+            filter: drop-shadow(0 0 6px #0284c7);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="info-panel">
+        <div>狀態: <b id="conn-status" style="color: #ef4444;">連線中...</b></div>
+        <div>在航船舶: <b id="ship-count" style="color: #fff;">0</b> 艘</div>
+        <div>刷新週期: <b>每 3 秒瞬移 2cm</b></div>
+        <div>資料接收次數: <b id="tick-count" style="color: #facc15;">0</b></div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 高雄港中心點
+        const map = L.map('map', { attributionControl: false }).setView([22.585, 120.295], 13);
+
+        // 使用 Carto Voyager 免金鑰圖層
+        L.tileLayer('https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 18
+        }).addTo(map);
+
+        const markers = {};
+        let ticks = 0;
+
+        // WebSocket 連線
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+        ws.onopen = () => {
+            document.getElementById('conn-status').innerText = '正常運作中';
+            document.getElementById('conn-status').style.color = '#4ade80';
+        };
+
+        ws.onclose = () => {
+            document.getElementById('conn-status').innerText = '連線斷開 (請檢查終端機)';
+            document.getElementById('conn-status').style.color = '#ef4444';
+        };
+
+        ws.onerror = (err) => {
+            console.error("WS 錯誤: ", err);
+        };
+
+        ws.onmessage = (event) => {
+            ticks++;
+            document.getElementById('tick-count').innerText = ticks;
+
+            const vessels = JSON.parse(event.data);
+            document.getElementById('ship-count').innerText = vessels.length;
+
+            vessels.forEach(v => {
+                const latLng = [v.lat, v.lon];
+                const customIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="transform: rotate(${v.cog}deg); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                             <div class="ship-marker"></div>
+                           </div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                if (markers[v.mmsi]) {
+                    // 直接跳轉到新座標
+                    markers[v.mmsi].setLatLng(latLng);
+                    markers[v.mmsi].setIcon(customIcon);
+                } else {
+                    const marker = L.marker(latLng, { icon: customIcon }).addTo(map);
+                    marker.bindTooltip(`<b>${v.name}</b>`, { permanent: false, direction: 'top' });
+                    markers[v.mmsi] = marker;
+                }
+            });
+        };
+    </script>
+</body>
+</html>
