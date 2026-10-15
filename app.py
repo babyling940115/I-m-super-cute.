@@ -677,7 +677,7 @@ async def websocket_endpoint(websocket: WebSocket):
             now_str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             data = []
             for v in fleet:
-                v.move(base_step_sea=0.0012, base_step_port=0.00015)
+                v.move(base_step_sea=0.0012, base_step_port=0.0015)
                 data.append({
                     "mmsi": v.mmsi,
                     "name": v.name,
