@@ -88,7 +88,7 @@ OFFSHORE_ANCHOR_HOTSPOTS = [
     },
 ]
 
-# ================= 2. 高雄港深水主航槽 (完全在藍色水體中，無死角避開所有兩岸陸地) =================
+# ================= 2. 高雄港深水主航槽 =================
 
 
 def generate_dense_spline(waypoints: list, num_sub: int = 15) -> list:
@@ -106,30 +106,24 @@ def generate_dense_spline(waypoints: list, num_sub: int = 15) -> list:
 
 
 RAW_PORT_MAIN_KEYPOINTS = [
-    {"lat": 22.6280, "lon": 120.2450},  # 一港口外引水區
-    {"lat": 22.6200, "lon": 120.2540},  # 一港口導流槽
-    {"lat": 22.6170, "lon": 120.2640},  # 一港口航門中心
-    {"lat": 22.6148, "lon": 120.2710},  # 哨船頭水道中心
-    {"lat": 22.6115, "lon": 120.2770},  # 棧貳庫對開主航道
-    {"lat": 22.6050, "lon": 120.2840},  # 旅運中心對開大水槽中線
-    {"lat": 22.5970, "lon": 120.2880},  # 大華二路對開深水航槽中線
-    {"lat": 22.5890, "lon": 120.2930},  # 中島西南迴船水槽 (避開大華三路)
-    {"lat": 22.5810, "lon": 120.2980},  # 60號碼頭西側深水區
-    {"lat": 22.5750, "lon": 120.3030},  # 61/62號碼頭水側正前方深水大航槽
-    {
-        "lat": 22.5690,
-        "lon": 120.3085,
-    },  # 過港隧道上方主水道深水區 (西距旗津一路350m，東距前鎮350m正中)
-    {"lat": 22.5630, "lon": 120.3135},  # 前鎮漁港西岸碼頭外航槽正中
-    {"lat": 22.5580, "lon": 120.3190},  # 陽明碼頭西側深水槽
-    {
-        "lat": 22.5560,
-        "lon": 120.3230,
-    },  # 文化遊艇紅毛港站正前方開闊水體 (上面那個海)
-    {"lat": 22.5510, "lon": 120.3140},  # 航門水面中心，遠離南星尖角
-    {"lat": 22.5450, "lon": 120.3030},  # 出二港口防波堤外航槽
-    {"lat": 22.5390, "lon": 120.2920},  # 二港口深海外導槽
-    {"lat": 22.5280, "lon": 120.2800},  # 外海深水開闊海域
+    {"lat": 22.6280, "lon": 120.2450},
+    {"lat": 22.6200, "lon": 120.2540},
+    {"lat": 22.6170, "lon": 120.2640},
+    {"lat": 22.6148, "lon": 120.2710},
+    {"lat": 22.6115, "lon": 120.2770},
+    {"lat": 22.6050, "lon": 120.2840},
+    {"lat": 22.5970, "lon": 120.2880},
+    {"lat": 22.5890, "lon": 120.2930},
+    {"lat": 22.5810, "lon": 120.2980},
+    {"lat": 22.5750, "lon": 120.3030},
+    {"lat": 22.5690, "lon": 120.3085},
+    {"lat": 22.5630, "lon": 120.3135},
+    {"lat": 22.5580, "lon": 120.3190},
+    {"lat": 22.5560, "lon": 120.3230},
+    {"lat": 22.5510, "lon": 120.3140},
+    {"lat": 22.5450, "lon": 120.3030},
+    {"lat": 22.5390, "lon": 120.2920},
+    {"lat": 22.5280, "lon": 120.2800},
 ]
 
 ROUTE_PORT_MAIN_DENSE = generate_dense_spline(
@@ -159,27 +153,22 @@ RAW_PILOT_S = [
 ]
 ROUTE_PILOT_S_DENSE = generate_dense_spline(RAW_PILOT_S, num_sub=10)
 
-# ================= 3. 高雄港純水體靜態繫泊點 (緊靠碼頭水側岸壁，不擋航道) =================
+# ================= 3. 高雄港純水體靜態繫泊點 =================
 
 PORT_PURE_WATER_BERTHS = [
-    # A. 蓬萊商港區 (棧貳庫/香蕉碼頭沿岸水側)
     {"lat": 22.6180, "lon": 120.2760, "type": "passenger"},
     {"lat": 22.6170, "lon": 120.2785, "type": "passenger"},
     {"lat": 22.6155, "lon": 120.2810, "type": "special"},
-    # B. 旗津修造船廠內緣港槽水面
     {"lat": 22.6085, "lon": 120.2785, "type": "fishing"},
     {"lat": 22.6055, "lon": 120.2805, "type": "special"},
     {"lat": 22.6025, "lon": 120.2825, "type": "cargo"},
     {"lat": 22.5995, "lon": 120.2845, "type": "fishing"},
     {"lat": 22.5965, "lon": 120.2860, "type": "special"},
-    # C. 新光碼頭與光榮碼頭沿岸水側
     {"lat": 22.6075, "lon": 120.2915, "type": "passenger"},
     {"lat": 22.6035, "lon": 120.2935, "type": "special"},
-    # D. 小港臨海新村港池水面正中心
     {"lat": 22.5435, "lon": 120.3400, "type": "fishing"},
     {"lat": 22.5420, "lon": 120.3415, "type": "fishing"},
     {"lat": 22.5405, "lon": 120.3430, "type": "fishing"},
-    # E. 高雄外海指定大錨區
     {"lat": 22.5500, "lon": 120.1200, "type": "tanker"},
     {"lat": 22.5600, "lon": 120.1100, "type": "cargo"},
     {"lat": 22.5400, "lon": 120.1000, "type": "tanker"},
@@ -191,12 +180,12 @@ PORT_PURE_WATER_BERTHS = [
 # ================= 4. 船種規範 =================
 
 SHIP_TYPES_DICT = {
-    "cargo": {"label": "貨船", "color": "#00b4d8"},  # 淺藍色
-    "tanker": {"label": "油輪", "color": "#ff1493"},  # 粉紅色
-    "fishing": {"label": "漁船", "color": "#0011ff"},  # 深藍色
-    "passenger": {"label": "客船", "color": "#ffaa00"},  # 黃色
-    "special": {"label": "引水/拖駁", "color": "#e60000"},  # 紅色
-    "other": {"label": "其他船舶", "color": "#94a3b8"},  # 灰色
+    "cargo": {"label": "貨船", "color": "#00b4d8"},
+    "tanker": {"label": "油輪", "color": "#ff1493"},
+    "fishing": {"label": "漁船", "color": "#0011ff"},
+    "passenger": {"label": "客船", "color": "#ffaa00"},
+    "special": {"label": "引水/拖駁", "color": "#e60000"},
+    "other": {"label": "其他船舶", "color": "#94a3b8"},
 }
 
 
@@ -321,7 +310,6 @@ def build_combined_fleet() -> List[PathLockedVessel]:
   letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   idx = 0
 
-  # 5.1 臺灣海峽與公海船隊 (~650 艘)
   sea_types_ratio = (
       ["cargo"] * 35
       + ["tanker"] * 20
@@ -374,7 +362,6 @@ def build_combined_fleet() -> List[PathLockedVessel]:
         )
     )
 
-  # 5.2 高雄港內部在航船 (主航道深槽中線，物理軌道拘束，14 艘)
   for i in range(14):
     st = random.choice(["cargo", "tanker", "special", "cargo"])
     mmsi = base_mmsi + idx
@@ -396,7 +383,6 @@ def build_combined_fleet() -> List[PathLockedVessel]:
         )
     )
 
-  # 鼓山 ↔ 旗津渡輪 (4 艘黃色客船，軌道拘束)
   for i in range(4):
     mmsi = base_mmsi + idx
     idx += 1
@@ -414,7 +400,6 @@ def build_combined_fleet() -> List[PathLockedVessel]:
         )
     )
 
-  # 一港口引水船 (4 艘紅色特種船)
   for i in range(4):
     mmsi = base_mmsi + idx
     idx += 1
@@ -432,7 +417,6 @@ def build_combined_fleet() -> List[PathLockedVessel]:
         )
     )
 
-  # 二港口引水船 (3 艘紅色特種船)
   for i in range(3):
     mmsi = base_mmsi + idx
     idx += 1
@@ -450,7 +434,6 @@ def build_combined_fleet() -> List[PathLockedVessel]:
         )
     )
 
-  # 5.3 高雄港內部真實靜態繫泊船隻 (100% 靠碼頭水側岸壁)
   for berth in PORT_PURE_WATER_BERTHS:
     mmsi = base_mmsi + idx
     idx += 1
@@ -477,7 +460,7 @@ def build_combined_fleet() -> List[PathLockedVessel]:
 
 fleet = build_combined_fleet()
 
-# ================= 6. 前端視圖 (海事專業工具列、原生 NLSC 地圖) =================
+# ================= 6. 前端視圖 =================
 
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="zh-TW">
@@ -491,52 +474,15 @@ HTML_PAGE = """<!DOCTYPE html>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", "微軟正黑體", sans-serif; }
         #map { height: 100vh; width: 100vw; background: #c5e4f3; }
 
+        /* 避開左上角原生縮放按鈕 (+-) */
         .system-topbar {
-            position: absolute; top: 15px; left: 60px; z-index: 1100;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        /* 縮放按鈕：改為黑底白字，與工具箱排在同一水平列 */
-        #zoom-container .leaflet-bar {
-            margin: 0 !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 6px !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        #zoom-container .leaflet-bar a {
-            background-color: #2b2b2b !important;
-            color: #ffffff !important;
-            border-bottom: 1px solid #444444 !important;
-            width: 32px !important;
-            height: 20px !important;
-            line-height: 18px !important;
-            font-size: 15px !important;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        #zoom-container .leaflet-bar a:last-child {
-            border-bottom: none !important;
-        }
-        #zoom-container .leaflet-bar a:hover {
-            background-color: #404040 !important;
-            color: #38bdf8 !important;
-        }
-
-        .system-btn-group {
-            background: rgba(45, 55, 72, 0.90);
-            backdrop-filter: blur(6px);
-            border-radius: 8px;
-            padding: 4px 10px;
-            display: flex;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+            position: absolute; 
+            top: 15px; 
+            left: 60px; 
+            z-index: 1100;
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
         }
 
         .toolbox-icon {
@@ -549,6 +495,17 @@ HTML_PAGE = """<!DOCTYPE html>
             box-shadow: 0 4px 16px rgba(0,0,0,0.35);
         }
         .toolbox-icon svg { width: 22px; height: 22px; fill: #cbd5e1; }
+
+        .system-btn-group {
+            background: rgba(45, 55, 72, 0.90);
+            backdrop-filter: blur(6px);
+            border-radius: 8px;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+        }
 
         .nav-tool-btn {
             background: transparent;
@@ -567,6 +524,31 @@ HTML_PAGE = """<!DOCTYPE html>
         .nav-tool-btn:last-child { border-right: none; }
         .nav-tool-btn:hover { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
         .nav-tool-btn svg { width: 16px; height: 16px; fill: #cbd5e1; }
+
+        /* AIS 圖例面板：預設置於工具列下方 */
+        .legend-panel {
+            position: absolute; 
+            top: 70px; 
+            left: 60px; 
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.94); 
+            color: #fff;
+            padding: 12px 18px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); 
+            font-size: 12px; 
+            line-height: 1.6;
+        }
+        .legend-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 4px 12px; 
+            margin-top: 6px; 
+            font-size: 12px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
         .leaflet-marker-icon { transition: none !important; cursor: pointer; }
 
@@ -602,14 +584,11 @@ HTML_PAGE = """<!DOCTYPE html>
 </head>
 <body>
     <div class="system-topbar">
-        <!-- 縮放按鈕掛載容器 -->
-        <div id="zoom-container"></div>
-
         <div class="toolbox-icon" title="工具箱">
             <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
         </div>
         <div class="system-btn-group">
-            <button class="nav-tool-btn">
+            <button class="nav-tool-btn" onclick="toggleLegend()">
                 <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
                 圖例
             </button>
@@ -636,19 +615,26 @@ HTML_PAGE = """<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- AIS 圖例面板 -->
+    <div class="legend-panel" id="legend-panel">
+        <b style="color: #38bdf8;">AIS 即時圖例</b> (在海總數: <b id="ship-count" style="color: #4ade80;">0</b> 艘)
+        <div class="legend-grid">
+            <div class="legend-item"><div class="legend-dot" style="background:#00b4d8;"></div>貨船 (淺藍)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ff1493;"></div>油輪 (粉紅)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#0011ff;"></div>漁船 (深藍)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ffaa00;"></div>客船/渡輪 (黃色)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e60000;"></div>引水/拖駁 (紅色)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div>其他船舶 (灰色)</div>
+        </div>
+    </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 關閉預設 zoomControl，避免重複出現左上角白底按鈕
         const map = L.map('map', { 
-            attributionControl: false,
-            zoomControl: false 
+            attributionControl: false 
         }).setView([22.569, 120.308], 14);
-
-        // 自訂建立 Leaflet 縮放元件並掛載到我們設計的頂部按鈕容器內
-        const zoomControl = L.control.zoom({ position: 'topleft' }).addTo(map);
-        document.getElementById('zoom-container').appendChild(zoomControl.getContainer());
 
         L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
             maxZoom: 18,
@@ -661,6 +647,11 @@ HTML_PAGE = """<!DOCTYPE html>
                 ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}
             `;
         });
+
+        function toggleLegend() {
+            const p = document.getElementById('legend-panel');
+            p.style.display = (p.style.display === 'none') ? 'block' : 'none';
+        }
 
         function searchVessel() {
             const kw = prompt("請輸入船名或 MMSI 進行定位查詢：");
@@ -769,6 +760,7 @@ HTML_PAGE = """<!DOCTYPE html>
 
         ws.onmessage = (event) => {
             const vessels = JSON.parse(event.data);
+            document.getElementById('ship-count').innerText = vessels.length;
 
             vessels.forEach(v => {
                 const latLng = [v.lat, v.lon];
@@ -816,7 +808,6 @@ async def websocket_endpoint(websocket: WebSocket):
       now_str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
       data = []
       for v in fleet:
-        # 港內步長調高至 0.015，確保港內船舶即時平順巡航
         v.move(base_step_sea=0.0012, base_step_port=0.015)
         data.append({
             "mmsi": v.mmsi,
