@@ -492,7 +492,7 @@ HTML_PAGE = """<!DOCTYPE html>
         #map { height: 100vh; width: 100vw; background: #c5e4f3; }
 
         .system-topbar {
-            position: absolute; top: 12px; left: 16px; z-index: 1100;
+            position: absolute; top: 15px; left: 60px; z-index: 1100;
             display: flex; align-items: center; gap: 8px;
         }
 
