@@ -2,7 +2,7 @@ import asyncio
 import math
 import random
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
@@ -51,27 +51,59 @@ CORRIDOR_BASHI_STRAIT = [
 ]
 
 OFFSHORE_ANCHOR_HOTSPOTS = [
-    {"lat_min": 22.42, "lat_max": 22.55, "lon_min": 120.02, "lon_max": 120.14, "weight": 4},
-    {"lat_min": 24.25, "lat_max": 24.48, "lon_min": 118.20, "lon_max": 118.55, "weight": 4},
-    {"lat_min": 24.20, "lat_max": 24.38, "lon_min": 120.26, "lon_max": 120.38, "weight": 2},
-    {"lat_min": 23.45, "lat_max": 23.65, "lon_min": 119.35, "lon_max": 119.55, "weight": 2},
-    {"lat_min": 25.18, "lat_max": 25.30, "lon_min": 121.40, "lon_max": 121.75, "weight": 2},
+    {
+        "lat_min": 22.42,
+        "lat_max": 22.55,
+        "lon_min": 120.02,
+        "lon_max": 120.14,
+        "weight": 4,
+    },
+    {
+        "lat_min": 24.25,
+        "lat_max": 24.48,
+        "lon_min": 118.20,
+        "lon_max": 118.55,
+        "weight": 4,
+    },
+    {
+        "lat_min": 24.20,
+        "lat_max": 24.38,
+        "lon_min": 120.26,
+        "lon_max": 120.38,
+        "weight": 2,
+    },
+    {
+        "lat_min": 23.45,
+        "lat_max": 23.65,
+        "lon_min": 119.35,
+        "lon_max": 119.55,
+        "weight": 2,
+    },
+    {
+        "lat_min": 25.18,
+        "lat_max": 25.30,
+        "lon_min": 121.40,
+        "lon_max": 121.75,
+        "weight": 2,
+    },
 ]
 
 # ================= 2. 高雄港深水主航槽 (完全在藍色水體中，無死角避開所有兩岸陸地) =================
 
+
 def generate_dense_spline(waypoints: list, num_sub: int = 15) -> list:
-    dense_path = []
-    for i in range(len(waypoints) - 1):
-        p1 = waypoints[i]
-        p2 = waypoints[i + 1]
-        for step in range(num_sub):
-            t = step / float(num_sub)
-            lat = p1["lat"] + (p2["lat"] - p1["lat"]) * t
-            lon = p1["lon"] + (p2["lon"] - p1["lon"]) * t
-            dense_path.append({"lat": round(lat, 6), "lon": round(lon, 6)})
-    dense_path.append(waypoints[-1])
-    return dense_path
+  dense_path = []
+  for i in range(len(waypoints) - 1):
+    p1 = waypoints[i]
+    p2 = waypoints[i + 1]
+    for step in range(num_sub):
+      t = step / float(num_sub)
+      lat = p1["lat"] + (p2["lat"] - p1["lat"]) * t
+      lon = p1["lon"] + (p2["lon"] - p1["lon"]) * t
+      dense_path.append({"lat": round(lat, 6), "lon": round(lon, 6)})
+  dense_path.append(waypoints[-1])
+  return dense_path
+
 
 RAW_PORT_MAIN_KEYPOINTS = [
     {"lat": 22.6280, "lon": 120.2450},  # 一港口外引水區
@@ -84,17 +116,25 @@ RAW_PORT_MAIN_KEYPOINTS = [
     {"lat": 22.5890, "lon": 120.2930},  # 中島西南迴船水槽 (避開大華三路)
     {"lat": 22.5810, "lon": 120.2980},  # 60號碼頭西側深水區
     {"lat": 22.5750, "lon": 120.3030},  # 61/62號碼頭水側正前方深水大航槽
-    {"lat": 22.5690, "lon": 120.3085},  # 過港隧道上方主水道深水區 (西距旗津一路350m，東距前鎮350m正中)
+    {
+        "lat": 22.5690,
+        "lon": 120.3085,
+    },  # 過港隧道上方主水道深水區 (西距旗津一路350m，東距前鎮350m正中)
     {"lat": 22.5630, "lon": 120.3135},  # 前鎮漁港西岸碼頭外航槽正中
     {"lat": 22.5580, "lon": 120.3190},  # 陽明碼頭西側深水槽
-    {"lat": 22.5560, "lon": 120.3230},  # 文化遊艇紅毛港站正前方開闊水體 (上面那個海)
+    {
+        "lat": 22.5560,
+        "lon": 120.3230,
+    },  # 文化遊艇紅毛港站正前方開闊水體 (上面那個海)
     {"lat": 22.5510, "lon": 120.3140},  # 航門水面中心，遠離南星尖角
     {"lat": 22.5450, "lon": 120.3030},  # 出二港口防波堤外航槽
     {"lat": 22.5390, "lon": 120.2920},  # 二港口深海外導槽
     {"lat": 22.5280, "lon": 120.2800},  # 外海深水開闊海域
 ]
 
-ROUTE_PORT_MAIN_DENSE = generate_dense_spline(RAW_PORT_MAIN_KEYPOINTS, num_sub=15)
+ROUTE_PORT_MAIN_DENSE = generate_dense_spline(
+    RAW_PORT_MAIN_KEYPOINTS, num_sub=15
+)
 
 RAW_FERRY_GUSHAN = [
     {"lat": 22.6180, "lon": 120.2680},
@@ -126,23 +166,19 @@ PORT_PURE_WATER_BERTHS = [
     {"lat": 22.6180, "lon": 120.2760, "type": "passenger"},
     {"lat": 22.6170, "lon": 120.2785, "type": "passenger"},
     {"lat": 22.6155, "lon": 120.2810, "type": "special"},
-
     # B. 旗津修造船廠內緣港槽水面
     {"lat": 22.6085, "lon": 120.2785, "type": "fishing"},
     {"lat": 22.6055, "lon": 120.2805, "type": "special"},
     {"lat": 22.6025, "lon": 120.2825, "type": "cargo"},
     {"lat": 22.5995, "lon": 120.2845, "type": "fishing"},
     {"lat": 22.5965, "lon": 120.2860, "type": "special"},
-
     # C. 新光碼頭與光榮碼頭沿岸水側
     {"lat": 22.6075, "lon": 120.2915, "type": "passenger"},
     {"lat": 22.6035, "lon": 120.2935, "type": "special"},
-
     # D. 小港臨海新村港池水面正中心
     {"lat": 22.5435, "lon": 120.3400, "type": "fishing"},
     {"lat": 22.5420, "lon": 120.3415, "type": "fishing"},
     {"lat": 22.5405, "lon": 120.3430, "type": "fishing"},
-
     # E. 高雄外海指定大錨區
     {"lat": 22.5500, "lon": 120.1200, "type": "tanker"},
     {"lat": 22.5600, "lon": 120.1100, "type": "cargo"},
@@ -155,201 +191,289 @@ PORT_PURE_WATER_BERTHS = [
 # ================= 4. 船種規範 =================
 
 SHIP_TYPES_DICT = {
-    "cargo": {"label": "貨船", "color": "#00b4d8"},       # 淺藍色
-    "tanker": {"label": "油輪", "color": "#ff1493"},      # 粉紅色
-    "fishing": {"label": "漁船", "color": "#0011ff"},     # 深藍色
-    "passenger": {"label": "客船", "color": "#ffaa00"},   # 黃色
-    "special": {"label": "引水/拖駁", "color": "#e60000"}, # 紅色
-    "other": {"label": "其他船舶", "color": "#94a3b8"},   # 灰色
+    "cargo": {"label": "貨船", "color": "#00b4d8"},  # 淺藍色
+    "tanker": {"label": "油輪", "color": "#ff1493"},  # 粉紅色
+    "fishing": {"label": "漁船", "color": "#0011ff"},  # 深藍色
+    "passenger": {"label": "客船", "color": "#ffaa00"},  # 黃色
+    "special": {"label": "引水/拖駁", "color": "#e60000"},  # 紅色
+    "other": {"label": "其他船舶", "color": "#94a3b8"},  # 灰色
 }
 
+
 class PathLockedVessel:
-    def __init__(self, mmsi: int, name: str, callsign: str, imo: int, st_type: str, 
-                 is_anchored: bool = False, route: list = None, exact_coord: dict = None,
-                 speed_knots: float = 10.0, is_port_vessel: bool = False):
-        self.mmsi = mmsi
-        self.name = name
-        self.callsign = callsign
-        self.imo = imo
-        self.st_type = st_type
-        self.type_name = SHIP_TYPES_DICT[st_type]["label"]
-        self.color = SHIP_TYPES_DICT[st_type]["color"]
-        self.is_anchored = is_anchored
-        self.is_port_vessel = is_port_vessel
-        self.sog = 0.0 if is_anchored else round(speed_knots, 1)
 
-        if self.is_anchored:
-            if exact_coord:
-                self.lat = exact_coord["lat"]
-                self.lon = exact_coord["lon"]
-                self.cog = float(random.choice([45, 135, 225, 315]))
-            else:
-                zone = random.choice(OFFSHORE_ANCHOR_HOTSPOTS)
-                self.lat = round(random.uniform(zone["lat_min"], zone["lat_max"]), 6)
-                self.lon = round(random.uniform(zone["lon_min"], zone["lon_max"]), 6)
-                self.cog = float(random.randint(0, 360))
-            self.route = []
-            self.progress = 0.0
-            self.forward = True
-        else:
-            self.route = route
-            self.progress = float(random.randint(0, len(route) - 2)) + random.uniform(0.1, 0.9)
-            self.forward = random.choice([True, False])
+  def __init__(
+      self,
+      mmsi: int,
+      name: str,
+      callsign: str,
+      imo: int,
+      st_type: str,
+      is_anchored: bool = False,
+      route: list = None,
+      exact_coord: dict = None,
+      speed_knots: float = 10.0,
+      is_port_vessel: bool = False,
+  ):
+    self.mmsi = mmsi
+    self.name = name
+    self.callsign = callsign
+    self.imo = imo
+    self.st_type = st_type
+    self.type_name = SHIP_TYPES_DICT[st_type]["label"]
+    self.color = SHIP_TYPES_DICT[st_type]["color"]
+    self.is_anchored = is_anchored
+    self.is_port_vessel = is_port_vessel
+    self.sog = 0.0 if is_anchored else round(speed_knots, 1)
 
-            idx = int(self.progress)
-            t = self.progress - idx
-            p1 = self.route[idx]
-            p2 = self.route[min(idx + 1, len(self.route) - 1)]
-            self.lat = round(p1["lat"] + (p2["lat"] - p1["lat"]) * t, 6)
-            self.lon = round(p1["lon"] + (p2["lon"] - p1["lon"]) * t, 6)
+    if self.is_anchored:
+      if exact_coord:
+        self.lat = exact_coord["lat"]
+        self.lon = exact_coord["lon"]
+        self.cog = float(random.choice([45, 135, 225, 315]))
+      else:
+        zone = random.choice(OFFSHORE_ANCHOR_HOTSPOTS)
+        self.lat = round(random.uniform(zone["lat_min"], zone["lat_max"]), 6)
+        self.lon = round(random.uniform(zone["lon_min"], zone["lon_max"]), 6)
+        self.cog = float(random.randint(0, 360))
+      self.route = []
+      self.progress = 0.0
+      self.forward = True
+    else:
+      self.route = route
+      self.progress = float(random.randint(0, len(route) - 2)) + random.uniform(
+          0.1, 0.9
+      )
+      self.forward = random.choice([True, False])
 
-            if not is_port_vessel:
-                self.lat += random.uniform(-0.015, 0.015)
-                self.lon += random.uniform(-0.015, 0.015)
-                if self.lon > 120.15 and 22.40 <= self.lat <= 22.70:
-                    self.lon = 120.10
+      idx = int(self.progress)
+      t = self.progress - idx
+      p1 = self.route[idx]
+      p2 = self.route[min(idx + 1, len(self.route) - 1)]
+      self.lat = round(p1["lat"] + (p2["lat"] - p1["lat"]) * t, 6)
+      self.lon = round(p1["lon"] + (p2["lon"] - p1["lon"]) * t, 6)
 
-            self.cog = float(self.calculate_tangent_bearing())
+      if not is_port_vessel:
+        self.lat += random.uniform(-0.015, 0.015)
+        self.lon += random.uniform(-0.015, 0.015)
+        if self.lon > 120.15 and 22.40 <= self.lat <= 22.70:
+          self.lon = 120.10
 
-    def calculate_tangent_bearing(self) -> float:
-        idx = int(self.progress)
-        lookahead = 2 if self.forward else -2
-        next_idx = max(0, min(len(self.route) - 1, idx + lookahead))
-        
-        target = self.route[next_idx]
-        dlat = target["lat"] - self.lat
-        dlon = target["lon"] - self.lon
-        bearing = math.degrees(math.atan2(dlon, dlat))
-        return (bearing + 360.0) % 360.0
+      self.cog = float(self.calculate_tangent_bearing())
 
-    def move(self, base_step_sea: float, base_step_port: float):
-        if self.is_anchored:
-            self.sog = 0.0
-            return
+  def calculate_tangent_bearing(self) -> float:
+    idx = int(self.progress)
+    lookahead = 2 if self.forward else -2
+    next_idx = max(0, min(len(self.route) - 1, idx + lookahead))
 
-        step = (base_step_port if self.is_port_vessel else base_step_sea) * (self.sog / 10.0)
-        progress_delta = step * 18.0
+    target = self.route[next_idx]
+    dlat = target["lat"] - self.lat
+    dlon = target["lon"] - self.lon
+    bearing = math.degrees(math.atan2(dlon, dlat))
+    return (bearing + 360.0) % 360.0
 
-        if self.forward:
-            self.progress += progress_delta
-            if self.progress >= len(self.route) - 1.05:
-                self.forward = False
-                self.progress = len(self.route) - 1.05
-        else:
-            self.progress -= progress_delta
-            if self.progress <= 0.05:
-                self.forward = True
-                self.progress = 0.05
+  def move(self, base_step_sea: float, base_step_port: float):
+    if self.is_anchored:
+      self.sog = 0.0
+      return
 
-        idx = int(self.progress)
-        t = self.progress - idx
-        p1 = self.route[idx]
-        p2 = self.route[min(idx + 1, len(self.route) - 1)]
+    step = (base_step_port if self.is_port_vessel else base_step_sea) * (
+        self.sog / 10.0
+    )
+    progress_delta = step * 18.0
 
-        self.lat = round(p1["lat"] + (p2["lat"] - p1["lat"]) * t, 6)
-        self.lon = round(p1["lon"] + (p2["lon"] - p1["lon"]) * t, 6)
+    if self.forward:
+      self.progress += progress_delta
+      if self.progress >= len(self.route) - 1.05:
+        self.forward = False
+        self.progress = len(self.route) - 1.05
+    else:
+      self.progress -= progress_delta
+      if self.progress <= 0.05:
+        self.forward = True
+        self.progress = 0.05
 
-        target_bearing = self.calculate_tangent_bearing()
-        diff = (target_bearing - self.cog + 180.0) % 360.0 - 180.0
+    idx = int(self.progress)
+    t = self.progress - idx
+    p1 = self.route[idx]
+    p2 = self.route[min(idx + 1, len(self.route) - 1)]
 
-        max_turn_rate = 3.2 if self.is_port_vessel else 4.5
-        if abs(diff) <= max_turn_rate:
-            self.cog = target_bearing
-        else:
-            turn = math.copysign(max_turn_rate, diff)
-            self.cog = (self.cog + turn + 360.0) % 360.0
+    self.lat = round(p1["lat"] + (p2["lat"] - p1["lat"]) * t, 6)
+    self.lon = round(p1["lon"] + (p2["lon"] - p1["lon"]) * t, 6)
+
+    target_bearing = self.calculate_tangent_bearing()
+    diff = (target_bearing - self.cog + 180.0) % 360.0 - 180.0
+
+    max_turn_rate = 6.0 if self.is_port_vessel else 4.5
+    if abs(diff) <= max_turn_rate:
+      self.cog = target_bearing
+    else:
+      turn = math.copysign(max_turn_rate, diff)
+      self.cog = (self.cog + turn + 360.0) % 360.0
+
 
 # ================= 5. 建立整合船隊 =================
 
+
 def build_combined_fleet() -> List[PathLockedVessel]:
-    fleet_list = []
-    base_mmsi = 412330000
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    idx = 0
+  fleet_list = []
+  base_mmsi = 412330000
+  letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  idx = 0
 
-    # 5.1 臺灣海峽與公海船隊 (~650 艘)
-    sea_types_ratio = (
-        ["cargo"] * 35 + ["tanker"] * 20 + ["fishing"] * 22 +
-        ["passenger"] * 8 + ["other"] * 8 + ["special"] * 7
+  # 5.1 臺灣海峽與公海船隊 (~650 艘)
+  sea_types_ratio = (
+      ["cargo"] * 35
+      + ["tanker"] * 20
+      + ["fishing"] * 22
+      + ["passenger"] * 8
+      + ["other"] * 8
+      + ["special"] * 7
+  )
+  weighted_sea_routes = (
+      [CORRIDOR_MAINLAND_COAST] * 4
+      + [CORRIDOR_STRAIT_CENTER] * 3
+      + [CORRIDOR_PENGHU_CHANNEL] * 2
+      + [CORRIDOR_EAST_COAST] * 2
+      + [CORRIDOR_BASHI_STRAIT] * 2
+  )
+
+  for _ in range(650):
+    st = random.choice(sea_types_ratio)
+    mmsi = base_mmsi + idx
+    idx += 1
+    is_anchored = random.random() < 0.22
+    route = random.choice(weighted_sea_routes)
+    callsign = "".join(random.choices(letters, k=4))
+    imo = (
+        0
+        if st in ["fishing", "special", "other"]
+        else random.randint(9100000, 9999999)
     )
-    weighted_sea_routes = (
-        [CORRIDOR_MAINLAND_COAST] * 4 +
-        [CORRIDOR_STRAIT_CENTER] * 3 +
-        [CORRIDOR_PENGHU_CHANNEL] * 2 +
-        [CORRIDOR_EAST_COAST] * 2 +
-        [CORRIDOR_BASHI_STRAIT] * 2
+    name = (
+        f"CHANGFENG_{mmsi % 1000}"
+        if st == "tanker"
+        else (
+            f"MIN_YU_{mmsi % 10000:04d}"
+            if st == "fishing"
+            else f"OCEAN_LINE_{mmsi % 1000}"
+        )
     )
 
-    for _ in range(650):
-        st = random.choice(sea_types_ratio)
-        mmsi = base_mmsi + idx
-        idx += 1
-        is_anchored = random.random() < 0.22
-        route = random.choice(weighted_sea_routes)
-        callsign = "".join(random.choices(letters, k=4))
-        imo = 0 if st in ["fishing", "special", "other"] else random.randint(9100000, 9999999)
-        name = f"CHANGFENG_{mmsi % 1000}" if st == "tanker" else (f"MIN_YU_{mmsi % 10000:04d}" if st == "fishing" else f"OCEAN_LINE_{mmsi % 1000}")
+    fleet_list.append(
+        PathLockedVessel(
+            mmsi=mmsi,
+            name=name,
+            callsign=callsign,
+            imo=imo,
+            st_type=st,
+            is_anchored=is_anchored,
+            route=route,
+            speed_knots=random.uniform(8.5, 16.5),
+            is_port_vessel=False,
+        )
+    )
 
-        fleet_list.append(PathLockedVessel(
-            mmsi=mmsi, name=name, callsign=callsign, imo=imo, st_type=st,
-            is_anchored=is_anchored, route=route, speed_knots=random.uniform(8.5, 16.5), is_port_vessel=False
-        ))
+  # 5.2 高雄港內部在航船 (主航道深槽中線，物理軌道拘束，14 艘)
+  for i in range(14):
+    st = random.choice(["cargo", "tanker", "special", "cargo"])
+    mmsi = base_mmsi + idx
+    idx += 1
+    name = (
+        f"EVER_PORT_{i+1:02d}" if st == "cargo" else f"FORMOSA_OIL_{i+1:02d}"
+    )
+    fleet_list.append(
+        PathLockedVessel(
+            mmsi=mmsi,
+            name=name,
+            callsign=f"BK{random.randint(1000,9999)}",
+            imo=random.randint(9100000, 9999999),
+            st_type=st,
+            is_anchored=False,
+            route=ROUTE_PORT_MAIN_DENSE,
+            speed_knots=random.uniform(6.5, 8.5),
+            is_port_vessel=True,
+        )
+    )
 
-    # 5.2 高雄港內部在航船 (主航道深槽中線，物理軌道拘束，14 艘)
-    for i in range(14):
-        st = random.choice(["cargo", "tanker", "special", "cargo"])
-        mmsi = base_mmsi + idx
-        idx += 1
-        name = f"EVER_PORT_{i+1:02d}" if st == "cargo" else f"FORMOSA_OIL_{i+1:02d}"
-        fleet_list.append(PathLockedVessel(
-            mmsi=mmsi, name=name, callsign=f"BK{random.randint(1000,9999)}",
-            imo=random.randint(9100000, 9999999), st_type=st, is_anchored=False,
-            route=ROUTE_PORT_MAIN_DENSE, speed_knots=random.uniform(6.5, 8.5), is_port_vessel=True
-        ))
+  # 鼓山 ↔ 旗津渡輪 (4 艘黃色客船，軌道拘束)
+  for i in range(4):
+    mmsi = base_mmsi + idx
+    idx += 1
+    fleet_list.append(
+        PathLockedVessel(
+            mmsi=mmsi,
+            name=f"旗鼓輪 {i+1} 號",
+            callsign=f"FERRY{i+1}",
+            imo=0,
+            st_type="passenger",
+            is_anchored=False,
+            route=ROUTE_FERRY_GUSHAN_DENSE,
+            speed_knots=5.5,
+            is_port_vessel=True,
+        )
+    )
 
-    # 鼓山 ↔ 旗津渡輪 (4 艘黃色客船，軌道拘束)
-    for i in range(4):
-        mmsi = base_mmsi + idx
-        idx += 1
-        fleet_list.append(PathLockedVessel(
-            mmsi=mmsi, name=f"旗鼓輪 {i+1} 號", callsign=f"FERRY{i+1}",
-            imo=0, st_type="passenger", is_anchored=False,
-            route=ROUTE_FERRY_GUSHAN_DENSE, speed_knots=5.5, is_port_vessel=True
-        ))
+  # 一港口引水船 (4 艘紅色特種船)
+  for i in range(4):
+    mmsi = base_mmsi + idx
+    idx += 1
+    fleet_list.append(
+        PathLockedVessel(
+            mmsi=mmsi,
+            name=f"高雄引水艇 0{i+1}",
+            callsign=f"PILOT{i+1}",
+            imo=0,
+            st_type="special",
+            is_anchored=False,
+            route=ROUTE_PILOT_N_DENSE,
+            speed_knots=8.0,
+            is_port_vessel=True,
+        )
+    )
 
-    # 一港口引水船 (4 艘紅色特種船)
-    for i in range(4):
-        mmsi = base_mmsi + idx
-        idx += 1
-        fleet_list.append(PathLockedVessel(
-            mmsi=mmsi, name=f"高雄引水艇 0{i+1}", callsign=f"PILOT{i+1}",
-            imo=0, st_type="special", is_anchored=False,
-            route=ROUTE_PILOT_N_DENSE, speed_knots=8.0, is_port_vessel=True
-        ))
+  # 二港口引水船 (3 艘紅色特種船)
+  for i in range(3):
+    mmsi = base_mmsi + idx
+    idx += 1
+    fleet_list.append(
+        PathLockedVessel(
+            mmsi=mmsi,
+            name=f"高港引水 2{i+1}",
+            callsign=f"PILOT2{i+1}",
+            imo=0,
+            st_type="special",
+            is_anchored=False,
+            route=ROUTE_PILOT_S_DENSE,
+            speed_knots=7.5,
+            is_port_vessel=True,
+        )
+    )
 
-    # 二港口引水船 (3 艘紅色特種船)
-    for i in range(3):
-        mmsi = base_mmsi + idx
-        idx += 1
-        fleet_list.append(PathLockedVessel(
-            mmsi=mmsi, name=f"高港引水 2{i+1}", callsign=f"PILOT2{i+1}",
-            imo=0, st_type="special", is_anchored=False,
-            route=ROUTE_PILOT_S_DENSE, speed_knots=7.5, is_port_vessel=True
-        ))
-
-    # 5.3 高雄港內部真實靜態繫泊船隻 (100% 靠碼頭水側岸壁)
-    for berth in PORT_PURE_WATER_BERTHS:
-        mmsi = base_mmsi + idx
-        idx += 1
-        st = berth["type"]
-        fleet_list.append(PathLockedVessel(
-            mmsi=mmsi, name=f"BERTH_{mmsi % 1000:03d}",
+  # 5.3 高雄港內部真實靜態繫泊船隻 (100% 靠碼頭水側岸壁)
+  for berth in PORT_PURE_WATER_BERTHS:
+    mmsi = base_mmsi + idx
+    idx += 1
+    st = berth["type"]
+    fleet_list.append(
+        PathLockedVessel(
+            mmsi=mmsi,
+            name=f"BERTH_{mmsi % 1000:03d}",
             callsign=f"BM{random.randint(1000, 9999)}",
-            imo=random.randint(9200000, 9999999) if st in ["cargo", "tanker"] else 0,
-            st_type=st, is_anchored=True, exact_coord=berth, is_port_vessel=True
-        ))
+            imo=(
+                random.randint(9200000, 9999999)
+                if st in ["cargo", "tanker"]
+                else 0
+            ),
+            st_type=st,
+            is_anchored=True,
+            exact_coord=berth,
+            is_port_vessel=True,
+        )
+    )
 
-    return fleet_list
+  return fleet_list
+
 
 fleet = build_combined_fleet()
 
@@ -370,6 +494,38 @@ HTML_PAGE = """<!DOCTYPE html>
         .system-topbar {
             position: absolute; top: 12px; left: 16px; z-index: 1100;
             display: flex; align-items: center; gap: 8px;
+        }
+
+        /* 縮放按鈕：改為黑底白字，與工具箱排在同一水平列 */
+        #zoom-container .leaflet-bar {
+            margin: 0 !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #zoom-container .leaflet-bar a {
+            background-color: #2b2b2b !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid #444444 !important;
+            width: 32px !important;
+            height: 20px !important;
+            line-height: 18px !important;
+            font-size: 15px !important;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        #zoom-container .leaflet-bar a:last-child {
+            border-bottom: none !important;
+        }
+        #zoom-container .leaflet-bar a:hover {
+            background-color: #404040 !important;
+            color: #38bdf8 !important;
         }
 
         .system-btn-group {
@@ -412,18 +568,6 @@ HTML_PAGE = """<!DOCTYPE html>
         .nav-tool-btn:hover { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
         .nav-tool-btn svg { width: 16px; height: 16px; fill: #cbd5e1; }
 
-        .legend-panel {
-            position: absolute; top: 70px; left: 16px; z-index: 1000;
-            background: rgba(15, 23, 42, 0.94); color: #fff;
-            padding: 12px 18px; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.4);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5); font-size: 12px; line-height: 1.6;
-        }
-        .legend-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin-top: 6px; font-size: 12px;
-        }
-        .legend-item { display: flex; align-items: center; gap: 6px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
-
         .leaflet-marker-icon { transition: none !important; cursor: pointer; }
 
         .ship-wrap {
@@ -458,11 +602,14 @@ HTML_PAGE = """<!DOCTYPE html>
 </head>
 <body>
     <div class="system-topbar">
+        <!-- 縮放按鈕掛載容器 -->
+        <div id="zoom-container"></div>
+
         <div class="toolbox-icon" title="工具箱">
             <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
         </div>
         <div class="system-btn-group">
-            <button class="nav-tool-btn" onclick="toggleLegend()">
+            <button class="nav-tool-btn">
                 <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
                 圖例
             </button>
@@ -489,23 +636,19 @@ HTML_PAGE = """<!DOCTYPE html>
         </div>
     </div>
 
-    <div class="legend-panel" id="legend-panel">
-        <b style="color: #38bdf8;">AIS 即時圖例</b> (在海總數: <b id="ship-count" style="color: #4ade80;">0</b> 艘)
-        <div class="legend-grid">
-            <div class="legend-item"><div class="legend-dot" style="background:#00b4d8;"></div>貨船 (淺藍)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#ff1493;"></div>油輪 (粉紅)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#0011ff;"></div>漁船 (深藍)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#ffaa00;"></div>客船/渡輪 (黃色)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#e60000;"></div>引水/拖駁 (紅色)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div>其他船舶 (灰色)</div>
-        </div>
-    </div>
-
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const map = L.map('map', { attributionControl: false }).setView([22.569, 120.308], 14);
+        // 關閉預設 zoomControl，避免重複出現左上角白底按鈕
+        const map = L.map('map', { 
+            attributionControl: false,
+            zoomControl: false 
+        }).setView([22.569, 120.308], 14);
+
+        // 自訂建立 Leaflet 縮放元件並掛載到我們設計的頂部按鈕容器內
+        const zoomControl = L.control.zoom({ position: 'topleft' }).addTo(map);
+        document.getElementById('zoom-container').appendChild(zoomControl.getContainer());
 
         L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
             maxZoom: 18,
@@ -518,11 +661,6 @@ HTML_PAGE = """<!DOCTYPE html>
                 ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}
             `;
         });
-
-        function toggleLegend() {
-            const p = document.getElementById('legend-panel');
-            p.style.display = (p.style.display === 'none') ? 'block' : 'none';
-        }
 
         function searchVessel() {
             const kw = prompt("請輸入船名或 MMSI 進行定位查詢：");
@@ -631,7 +769,6 @@ HTML_PAGE = """<!DOCTYPE html>
 
         ws.onmessage = (event) => {
             const vessels = JSON.parse(event.data);
-            document.getElementById('ship-count').innerText = vessels.length;
 
             vessels.forEach(v => {
                 const latLng = [v.lat, v.lon];
@@ -665,37 +802,42 @@ HTML_PAGE = """<!DOCTYPE html>
 </html>
 """
 
+
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    return HTMLResponse(content=HTML_PAGE, status_code=200)
+  return HTMLResponse(content=HTML_PAGE, status_code=200)
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        while True:
-            now_str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-            data = []
-            for v in fleet:
-                v.move(base_step_sea=0.0012, base_step_port=0.0015)
-                data.append({
-                    "mmsi": v.mmsi,
-                    "name": v.name,
-                    "callsign": v.callsign,
-                    "imo": v.imo,
-                    "type_name": v.type_name,
-                    "lat": round(v.lat, 6),
-                    "lon": round(v.lon, 6),
-                    "cog": round(v.cog, 1),
-                    "sog": v.sog,
-                    "color": v.color,
-                    "record_time": now_str,
-                })
-            await websocket.send_json(data)
-            await asyncio.sleep(2.0)
-    except WebSocketDisconnect:
-        pass
+  await websocket.accept()
+  try:
+    while True:
+      now_str = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+      data = []
+      for v in fleet:
+        # 港內步長調高至 0.015，確保港內船舶即時平順巡航
+        v.move(base_step_sea=0.0012, base_step_port=0.015)
+        data.append({
+            "mmsi": v.mmsi,
+            "name": v.name,
+            "callsign": v.callsign,
+            "imo": v.imo,
+            "type_name": v.type_name,
+            "lat": round(v.lat, 6),
+            "lon": round(v.lon, 6),
+            "cog": round(v.cog, 1),
+            "sog": v.sog,
+            "color": v.color,
+            "record_time": now_str,
+        })
+      await websocket.send_json(data)
+      await asyncio.sleep(2.0)
+  except WebSocketDisconnect:
+    pass
+
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+  import uvicorn
+
+  uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
